@@ -151,7 +151,10 @@ dataset_ref_to_datasets = {
     "bpic2011": ["bpic2011_f%s"%formula for formula in range(1,5)],
     "bpic2015": ["bpic2015_%s_f2"%(municipality) for municipality in range(1,6)],
     "insurance": ["insurance_activity", "insurance_followup"],
-    "sepsis_cases": ["sepsis_cases_1", "sepsis_cases_2", "sepsis_cases_4"]
+    "sepsis_cases": ["sepsis_cases_1", "sepsis_cases_2", "sepsis_cases_4"],
+	"synth_log": ["synthetic_log_1", "synthetic_log_2", "synthetic_log_3"],
+	"synth_log_2": ["synthetic_log_4", "synthetic_log_5", "synthetic_log_6"],
+	"synth_log_3": ["synthetic_log_7", "synthetic_log_8", "synthetic_log_9"]
 }
 
 encoding_dict = {
@@ -164,7 +167,7 @@ encoding_dict = {
 datasets = [dataset_ref] if dataset_ref not in dataset_ref_to_datasets else dataset_ref_to_datasets[dataset_ref]
 methods = encoding_dict[cls_encoding]
     
-train_ratio = 0.8
+train_ratio = 0.5
 n_splits = 3
 random_state = 22
 

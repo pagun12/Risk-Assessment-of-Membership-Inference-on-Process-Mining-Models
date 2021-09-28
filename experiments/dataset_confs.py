@@ -63,6 +63,33 @@ for dataset in datasets:
                        'SIRSCritTemperature', 'SIRSCriteria2OrMore'] # i.e. case attributes that are known from the start
     dynamic_num_cols[dataset] = ['CRP', 'LacticAcid', 'Leucocytes', "hour", "weekday", "month", "timesincemidnight", "timesincelastevent", "timesincecasestart", "event_nr", "open_cases"]
     static_num_cols[dataset] = ['Age']
+	
+#### Synthetic Sepsis Cases settings ####
+datasets = ["synthetic_log_%s" % i for i in range(1, 10)]
+
+for dataset in datasets:
+    
+    filename[dataset] = os.path.join(logs_dir, "%s.csv" % dataset)
+
+    case_id_col[dataset] = "Case ID"
+    activity_col[dataset] = "Activity"
+    resource_col[dataset] = "org:group"
+    timestamp_col[dataset] = "time:timestamp"
+    label_col[dataset] = "label"
+    pos_label[dataset] = "deviant"
+    neg_label[dataset] = "regular"
+
+    # features for classifier
+    dynamic_cat_cols[dataset] = ["Activity", 'org:group'] # i.e. event attributes
+    static_cat_cols[dataset] = ['Diagnose', 'DiagnosticArtAstrup', 'DiagnosticBlood', 'DiagnosticECG',
+                       'DiagnosticIC', 'DiagnosticLacticAcid', 'DiagnosticLiquor',
+                       'DiagnosticOther', 'DiagnosticSputum', 'DiagnosticUrinaryCulture',
+                       'DiagnosticUrinarySediment', 'DiagnosticXthorax', 'DisfuncOrg',
+                       'Hypotensie', 'Hypoxie', 'InfectionSuspected', 'Infusion', 'Oligurie',
+                       'SIRSCritHeartRate', 'SIRSCritLeucos', 'SIRSCritTachypnea',
+                       'SIRSCritTemperature', 'SIRSCriteria2OrMore'] # i.e. case attributes that are known from the start
+    dynamic_num_cols[dataset] = ['CRP', 'LacticAcid', 'Leucocytes', "hour", "weekday", "month", "timesincemidnight", "timesincelastevent", "timesincecasestart", "event_nr", "open_cases"]
+    static_num_cols[dataset] = ['Age']
 
 
 #### Production log settings ####
