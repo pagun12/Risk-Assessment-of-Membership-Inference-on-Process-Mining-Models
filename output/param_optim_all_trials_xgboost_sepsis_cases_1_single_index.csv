@@ -1,0 +1,13 @@
+iter;dataset;cls;method;param;value;score
+2;sepsis_cases_1;xgboost;single_index;colsample_bytree;0.5439315839405026;0.4912699344810627
+2;sepsis_cases_1;xgboost;single_index;learning_rate;0.48317782032684375;0.4912699344810627
+2;sepsis_cases_1;xgboost;single_index;max_depth;6;0.4912699344810627
+2;sepsis_cases_1;xgboost;single_index;min_child_weight;4;0.4912699344810627
+2;sepsis_cases_1;xgboost;single_index;subsample;0.5945127534957511;0.4912699344810627
+2;sepsis_cases_1;xgboost;single_index;processing_time;10.242730855941772;0
+3;sepsis_cases_1;xgboost;single_index;colsample_bytree;0.6621496246391105;0.49580828746946665
+3;sepsis_cases_1;xgboost;single_index;learning_rate;0.10305319787874767;0.49580828746946665
+3;sepsis_cases_1;xgboost;single_index;max_depth;16;0.49580828746946665
+3;sepsis_cases_1;xgboost;single_index;min_child_weight;2;0.49580828746946665
+3;sepsis_cases_1;xgboost;single_index;subsample;0.7826665316933805;0.49580828746946665
+3;sepsis_cases_1;xgboost;single_index;processing_time;15.013205528259277;0
