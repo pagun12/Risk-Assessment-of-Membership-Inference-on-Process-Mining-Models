@@ -1,12 +1,14 @@
 import pandas as pd
 import numpy as np
 import os
+import pathlib
 
-input_data_folder = "../orig_logs"
-output_data_folder = "../labeled_logs_csv_processed"
-in_filename = "Sepsis Cases - Event Log.csv"
+path = pathlib.Path(__file__).parent.resolve()
+input_data_folder = path.parent / 'orig_logs'
+output_data_folder = path.parent / 'labeled_logs_csv_processed'
+in_filename = "sepsis_timestamp_abstraction-age.csv"#"sepsis_timestamp_abstraction.csv"#"sepsis_timestamp_abstraction-age.csv"#"sepsis_cases.csv"
 
-case_id_col = "Case ID"
+case_id_col = "CaseID"
 activity_col = "Activity"
 timestamp_col = "time:timestamp"
 label_col = "label"
@@ -25,7 +27,7 @@ static_cat_cols = ['Diagnose', 'DiagnosticArtAstrup', 'DiagnosticBlood', 'Diagno
        'SIRSCritHeartRate', 'SIRSCritLeucos', 'SIRSCritTachypnea',
        'SIRSCritTemperature', 'SIRSCriteria2OrMore'] # i.e. case attributes that are known from the start
 dynamic_num_cols = ['CRP', 'LacticAcid', 'Leucocytes']
-static_num_cols = ['Age']
+static_num_cols =[]# ['Age']
 
 static_cols = static_cat_cols + static_num_cols + [case_id_col]
 dynamic_cols = dynamic_cat_cols + dynamic_num_cols + [timestamp_col]
@@ -37,11 +39,12 @@ def extract_timestamp_features(group):
     group = group.sort_values(timestamp_col, ascending=False, kind='mergesort')
     
     tmp = group[timestamp_col] - group[timestamp_col].shift(-1)
-    tmp = tmp.fillna(0)
+    tmp = tmp.fillna(pd.Timedelta(seconds=0))#before tmp.fillna(0) 
+
     group["timesincelastevent"] = tmp.apply(lambda x: float(x / np.timedelta64(1, 'm'))) # m is for minutes
 
     tmp = group[timestamp_col] - group[timestamp_col].iloc[-1]
-    tmp = tmp.fillna(0)
+    tmp = tmp.fillna(pd.Timedelta(seconds=0))#before tmp.fillna(0)
     group["timesincecasestart"] = tmp.apply(lambda x: float(x / np.timedelta64(1, 'm'))) # m is for minutes
 
     group = group.sort_values(timestamp_col, ascending=True, kind='mergesort')
@@ -90,7 +93,7 @@ def check_if_any_of_activities_exist(group, activities):
         return True
     else:
         return False
-    
+
 data = pd.read_csv(os.path.join(input_data_folder, in_filename), sep=";")
 data[case_id_col] = data[case_id_col].fillna("missing_caseid")
 
@@ -98,11 +101,10 @@ data[case_id_col] = data[case_id_col].fillna("missing_caseid")
 tmp = data.groupby(case_id_col).apply(check_if_any_of_activities_exist, activities=["Release A", "Release B", "Release C", "Release D", "Release E"])
 incomplete_cases = tmp.index[tmp==False]
 data = data[~data[case_id_col].isin(incomplete_cases)]
-
 data = data[static_cols + dynamic_cols]
 
 # add features extracted from timestamp
-data[timestamp_col] = pd.to_datetime(data[timestamp_col])
+data[timestamp_col] = pd.to_datetime(data[timestamp_col]) #is datetime.
 data["timesincemidnight"] = data[timestamp_col].dt.hour * 60 + data[timestamp_col].dt.minute
 data["month"] = data[timestamp_col].dt.month
 data["weekday"] = data[timestamp_col].dt.weekday
@@ -111,7 +113,9 @@ data = data.groupby(case_id_col).apply(extract_timestamp_features)
 
 # add inter-case features
 data = data.sort_values([timestamp_col], ascending=True, kind='mergesort')
+data.reset_index(inplace=True, drop=True) #reset index; before case id col both an index level and a column label
 dt_first_last_timestamps = data.groupby(case_id_col)[timestamp_col].agg([min, max])
+
 dt_first_last_timestamps.columns = ["start_time", "end_time"]
 data["open_cases"] = data[timestamp_col].apply(get_open_cases)
 
@@ -132,13 +136,13 @@ for col in cat_cols:
 
 # first labeling
 dt_labeled = data.sort_values(timestamp_col, ascending=True, kind="mergesort").groupby(case_id_col).apply(check_if_activity_exists_and_time_less_than, activity="Return ER")
-dt_labeled.to_csv(os.path.join(output_data_folder, "sepsis_cases_1.csv"), sep=";", index=False)
+dt_labeled.to_csv(os.path.join(output_data_folder, "sepsis_timestamp_abstraction_noage_1.csv"), sep=";", index=False)
     
 # second labeling
 dt_labeled = data.sort_values(timestamp_col, ascending=True, kind="mergesort").groupby(case_id_col).apply(check_if_activity_exists, activity="Admission IC")
-dt_labeled.to_csv(os.path.join(output_data_folder, "sepsis_cases_2.csv"), sep=";", index=False)
+dt_labeled.to_csv(os.path.join(output_data_folder, "sepsis_timestamp_abstraction_noage_2.csv"), sep=";", index=False)
     
 # fourth labeling
 dt_labeled = data.sort_values(timestamp_col, ascending=True, kind="mergesort").groupby(case_id_col).apply(check_if_activity_exists, activity="Release A")
-dt_labeled.to_csv(os.path.join(output_data_folder, "sepsis_cases_4.csv"), sep=";", index=False)
+dt_labeled.to_csv(os.path.join(output_data_folder, "sepsis_timestamp_abstraction_noage_4.csv"), sep=";", index=False)
     
